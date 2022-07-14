@@ -40,7 +40,8 @@ const View = (() => {
         inputEmail: '#email',
         error: '#error',
         inputSearch: '#search', 
-        noResult: '#noResult'
+        noResult: '#noResult',
+        names: '#nameColumn'
     };
     
     const render = (ele, tmp) => {
@@ -93,40 +94,37 @@ const Model = ((view) => {
             view.render(tableContacts, tmp);
         }
     }
-    function validation() {
-        const name
-    }
-    //valdation 
-    // const validation = (name, mobile, email) => {
-    //     if (name && name.length <= 20) {
-    //         if(/\d/.test(name)){
-    //             return false; 
-    //         } else {
-    //             return true;
-    //         }
-    //     }
-
-    //     if (!mobile.toString().length === 10) {
-    //         if (/\d/.test(mobile)) {
-    //             return false;
-    //         } else {
-    //             return true; 
-    //         }
-    //     }
-
-    //     if (email || (email.includes("@") || email.length < 40)){
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // };
-
-
+    const sortArr = (arr, order) => {
+        if (order === "ascending") {
+          arr.sort((a, b) => {
+            if (a.name.toUpperCase() < b.name.toUpperCase()) {
+              return -1;
+            }
+            if (a.name.toUpperCase() > b.name.toUpperCase()) {
+              return 1;
+            }
+            return 0;
+          });
+        } else if (order === "desending") {
+          arr.sort((a, b) => {
+            if (a.name.toUpperCase() > b.name.toUpperCase()) {
+              return -1;
+            }
+            if (a.name.toUpperCase() < b.name.toUpperCase()) {
+              return 1;
+            }
+            return 0;
+          });
+        }
+        return arr;
+      };
     
+  
 
     return { 
         Contact,
         State,
+        sortArr
         // validation,
     };
 })(View);
@@ -139,6 +137,8 @@ const Model = ((view) => {
 const Controller = ((model, view) => {
     const state = new model.State();
 
+    const sortedArr = [];
+   
     //add contact
 
     const addContact = () => {
@@ -147,43 +147,72 @@ const Controller = ((model, view) => {
         const name = document.querySelector(view.domstr.inputName);
         const mobile = document.querySelector(view.domstr.inputMobile);
         const email = document.querySelector(view.domstr.inputEmail);
-        const form = document.querySelector(view.domstr.form);
+        // const form = document.querySelector(view.domstr.form);
 
-        addBtn.addEventListener('click', () => {
-            if (model.validation(name.value, mobile.value, email.value)) {
-                error.classList.add("dn");
+        const isValid = (name, mobile, email) => {
+            const nameCheck = (name) => (nameReg.test(name)) ;
+            const mobileCheck = (mobile) => (mobileReg.test(mobile)) ;
+            const emailCheck = (email) => (emailReg.test(email)) ;
+            
+            const nameReg = /^[a-zA-Z ]*$/ ;
+            const mobileReg = /^[0-9]*$/ ;
+            const emailReg = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/ ;
+
+            return nameCheck(name) && mobileCheck(mobile) && emailCheck(email);
+            
+        }
+
+        addBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isValid(name.value, mobile.value, email.value)) {
+                error.classList.add('dn');
                 const newContact = new model.Contact(name.value, mobile.value, email.value);
                 const contactsArr = [...state.contacts, newContact]; 
+                // contactsArr.push(newContact)
                 state.setList(contactsArr);
+               
+
                 ClearInputFields();
             } else {
-                error.classList.remove("dn");
+                error.classList.remove('dn');
             }
+            
         });
-        form.addEventListener('submit', (e) => {
-        let messages = [];
-        if (name.value === '' || name.value == null) {
-            messages.push('Name is required');
-        }
-        if (messages.length > 0) {
-            e.preventDefault();
-            error.innerText = messages.join(',');
-        }
-    })
-
+        
+      
         const ClearInputFields = () => {
             name.value = "",
             mobile.value = "",
             email.value = ""
         }
-    };
+    }
+    const sortName = () => {
+        const names = document.querySelector(view.domstr.names)
 
-    
+        names.addEventListener("click", (e) => {
+            console.log(e);
+        let order = "ascending"
+        if (order === "ascending") {
+            state.contacts = state.contacts.sort((a, b) => {
+            if (a.name > b.name) {
+                return 1;
+            }
+            });
+            order = "desending";
+        } else if (order === "desending") {
+            state.contacts = state.contacts.sort((a, b) => {
+            if (a.name < b.name) {
+                return 1;
+            }
+            });
+            order = "ascending";
+        }
+        });
+};
     const bootstrap = () => {
-        // init();
+        sortName();
         addContact();
     }
-
     return {
         bootstrap,
     };
