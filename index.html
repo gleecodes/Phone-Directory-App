@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="styles.css" />
-    <script type="module" src="script3.js"></script>
+    <script type="module" src="script.js"></script>
   </head>
   <body>
     <div class="margin20 textCenter flexCenter fs20">Phone Directory</div>
@@ -36,7 +36,7 @@
       </div>
       <div class="marginT40">
         <span>Search contact by Mobile No:</span>
-        <input type="text" id="search" value="" />
+        <input type="number" id="search" value="" />
       </div>
       <div class="marginT40 padL10 tab cursorPtr" id="contactsSummary">
         Contacts Summary
@@ -51,7 +51,7 @@
             </tr>
           </thead>
           <tbody id="tablebody">
-            <tr>
+            <tr id="rows">
               <td>admin</td>
               <td>1234567890</td>
               <td>test@test</td>
